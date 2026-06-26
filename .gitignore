@@ -1,0 +1,15 @@
+# Environment
+.env
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Models and data (too large for GitHub)
+models/
+data/
+
+# VS Code
+.vscode/
