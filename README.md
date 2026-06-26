@@ -14,8 +14,7 @@ Upload any PDF research paper to get instant structured summaries and ask questi
 ---
 
 ## 📺 Demo
-
-> 🚀 Live Demo — Coming Soon (Streamlit Cloud)
+> 🚀 **[Live Demo](https://research-paper-assistant-ngudxfnwknogw8x5skmsis.streamlit.app/)** — Try it now!
 
 ---
 
