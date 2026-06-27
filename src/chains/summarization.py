@@ -35,7 +35,7 @@ Structured Summary:"""
 
 
 def summarize_paper(documents: list) -> str:
-    llm = get_llm()
+    llm = get_llm(use_case="summary")
     parser = StrOutputParser()
 
     # Limit to first 10 chunks to avoid rate limits

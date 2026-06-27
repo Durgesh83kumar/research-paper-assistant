@@ -32,7 +32,7 @@ Respond ONLY with this exact JSON format, nothing else:
 def evaluate_answer(question: str, answer: str, context: str) -> dict:
     """Evaluate a PDF-based answer using LLM as a judge."""
     try:
-        llm = get_llm()
+        llm = get_llm(use_case="eval")
         parser = StrOutputParser()
         chain = EVAL_PROMPT | llm | parser
 
@@ -96,7 +96,7 @@ Respond ONLY with this exact JSON format, nothing else:
 def evaluate_general_answer(question: str, answer: str) -> dict:
     """Evaluate a general (non-PDF) answer using LLM as a judge."""
     try:
-        llm = get_llm()
+        llm = get_llm(use_case="eval")
         parser = StrOutputParser()
         chain = GENERAL_EVAL_PROMPT | llm | parser
 
