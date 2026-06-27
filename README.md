@@ -4,10 +4,10 @@
 
 Upload any PDF research paper to get instant structured summaries and ask questions in a **ChatGPT-style interface** — powered by LangChain, FAISS, and Groq.
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square&logo=python)
-![LangChain](https://img.shields.io/badge/LangChain-0.3-green?style=flat-square)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.45-red?style=flat-square&logo=streamlit)
-![Groq](https://img.shields.io/badge/Groq-Llama3.1-orange?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.13-blue?style=flat-square&logo=python)
+![LangChain](https://img.shields.io/badge/LangChain-1.3-green?style=flat-square)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.58-red?style=flat-square&logo=streamlit)
+![Groq](https://img.shields.io/badge/Groq-Llama3.3-orange?style=flat-square)
 ![FAISS](https://img.shields.io/badge/Vector_DB-FAISS-purple?style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker)
 
@@ -30,7 +30,7 @@ Upload any PDF research paper to get instant structured summaries and ask questi
 | 🗂️ **Multi-Chat** | Multiple independent chat sessions like ChatGPT |
 | 💾 **Persistence** | Chat history survives browser refresh and app restart |
 | 🤖 **General Q&A** | Works as a general AI assistant even without a PDF |
-| 🐳 **Docker Ready** | Fully containerized for deployment anywhere |
+| 🐳 **Docker Ready** | Fully containerized and available on Docker Hub |
 
 ---
 
@@ -58,21 +58,17 @@ Upload any PDF research paper to get instant structured summaries and ask questi
 
 │
 
-┌───────▼────────┐      ┌─────────────────┐
+┌───────▼────────┐      ┌──────────────────────────┐
 
-│  FAISS INDEX   │      │   GROQ LLM      │
+│  FAISS INDEX   │      │       GROQ LLM           │
 
-│  (per-chat)    │─────►│  Llama 3.1 8B   │
+│  (per-chat)    │─────►│  Chat: Llama 3.3 70B     │
 
-│  HuggingFace   │      │                 │
+│  HuggingFace   │      │  Summary: Llama 3.1 8B   │
 
-│  Embeddings    │      │  Summarization  │
+│  Embeddings    │      │  Eval: Llama 3.1 8B      │
 
-└────────────────┘      │  RAG Q&A        │
-
-│  Evaluation     │
-
-└─────────────────┘
+└────────────────┘      └──────────────────────────┘
 
 ### Data Flow
 
@@ -104,11 +100,12 @@ Display in Chat UI ✅
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **Frontend** | Streamlit | Chat UI with sidebar |
-| **LLM** | Groq (Llama 3.1 8B) | Summarization, Q&A, Evaluation |
+| **Frontend** | Streamlit 1.58 | Chat UI with sidebar |
+| **LLM (Chat)** | Groq Llama 3.3 70B | Best quality Q&A |
+| **LLM (Summary/Eval)** | Groq Llama 3.1 8B | Fast summarization & evaluation |
 | **Embeddings** | HuggingFace MiniLM | Text → Vectors |
-| **Vector DB** | FAISS | Semantic similarity search |
-| **Orchestration** | LangChain | Pipeline management |
+| **Vector DB** | FAISS | Per-chat semantic similarity search |
+| **Orchestration** | LangChain 1.3 | Pipeline management |
 | **PDF Parsing** | PyMuPDF | Text extraction |
 | **Evaluation** | LLM-as-a-Judge | Answer quality scoring |
 | **Storage** | JSON | Persistent chat history |
@@ -132,7 +129,7 @@ research-paper-assistant/
 
 │   ├── llm/
 
-│   │   └── factory.py           # LLM provider factory (Groq/Gemini)
+│   │   └── factory.py           # LLM factory (Groq/Gemini, use-case aware)
 
 │   ├── embeddings/
 
@@ -152,15 +149,15 @@ research-paper-assistant/
 
 │   │   ├── summarization.py     # Map-Reduce summarization chain
 
-│   │   └── rag_chain.py         # RAG Q&A with memory
+│   │   └── rag_chain.py         # RAG Q&A with conversational memory
 
 │   ├── evaluation/
 
-│   │   └── evaluator.py         # LLM-as-a-Judge evaluation
+│   │   └── evaluator.py         # LLM-as-a-Judge evaluation system
 
 │   └── storage/
 
-│       └── chat_store.py        # JSON chat persistence
+│       └── chat_store.py        # JSON persistent chat storage
 
 │
 
@@ -169,6 +166,8 @@ research-paper-assistant/
 ├── docker-compose.yml
 
 ├── requirements.txt
+
+├── requirements.docker.txt
 
 ├── .env.example
 
@@ -179,7 +178,7 @@ research-paper-assistant/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.13+
 - Groq API key (free) → [console.groq.com](https://console.groq.com)
 
 ### 1. Clone the repository
@@ -229,6 +228,12 @@ Open `http://localhost:8501` in your browser.
 
 ## 🐳 Docker Deployment
 
+### Pull from Docker Hub (Easiest)
+```bash
+docker pull durg1234/research-paper-assistant
+docker run -p 8501:8501 --env-file .env durg1234/research-paper-assistant
+```
+
 ### Using Docker Compose
 ```bash
 docker-compose up --build
@@ -241,6 +246,8 @@ docker run -p 8501:8501 --env-file .env research-paper-assistant
 ```
 
 App available at `http://localhost:8501`
+
+🐳 **Docker Hub:** [hub.docker.com/r/durg1234/research-paper-assistant](https://hub.docker.com/r/durg1234/research-paper-assistant)
 
 ---
 
@@ -260,7 +267,7 @@ App available at `http://localhost:8501`
 
 ## 📊 Evaluation System
 
-Every answer is automatically evaluated using **LLM-as-a-Judge** technique:
+Every answer is automatically evaluated using **LLM-as-a-Judge** technique — an industry-standard approach used by OpenAI, Google, and Anthropic:
 
 ### PDF Q&A Evaluation
 | Metric | Description |
@@ -303,11 +310,16 @@ After uploading a research paper:
 
 ## 🗺️ Roadmap
 
+- [x] ChatGPT-style multi-chat interface
+- [x] Per-chat isolated FAISS vector store
+- [x] Persistent chat history (survives refresh)
+- [x] LLM-as-a-Judge evaluation system
+- [x] Deploy on Streamlit Cloud
+- [x] Docker containerization & Docker Hub
 - [ ] Multi-PDF support per chat
 - [ ] Export chat history as PDF
 - [ ] Support for images and tables in papers
 - [ ] RAGAS evaluation framework integration
-- [ ] Deploy on Streamlit Cloud
 
 ---
 
@@ -316,6 +328,7 @@ After uploading a research paper:
 **Durgesh Kumar**
 - GitHub Profile: [@Durgesh83kumar](https://github.com/Durgesh83kumar)
 - Project Link: [research-paper-assistant](https://github.com/Durgesh83kumar/research-paper-assistant)
+- Docker Hub: [durg1234/research-paper-assistant](https://hub.docker.com/r/durg1234/research-paper-assistant)
 
 ---
 
